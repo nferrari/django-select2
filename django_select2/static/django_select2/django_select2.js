@@ -42,7 +42,11 @@
     };
 
     $(function () {
-        $('.django-select2').djangoSelect2();
+        $('.django-select2').not('.empty-form .django-select2').djangoSelect2();
+    });
+
+    django.jQuery(document).on('formset:added', function(event, $row, formsetName) {
+        $($row).find('.django-select2').djangoSelect2();
     });
 
 }(this.jQuery));
