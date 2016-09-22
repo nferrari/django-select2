@@ -123,7 +123,27 @@ class Select2AdminMixin(object):
 
 
 class Select2AdminInlineMixin(Select2AdminMixin):
+    """
+    The base mixin for Django admin inline configuration classes.
 
+    This mixin is responsible for making sure that the widget media are
+    correctly collected while providing integration with the Django wrapper
+    that renders the visual tools to interact with related models (i.e. the
+    add, edit and delete buttons next to the widget in the admin).
+
+    The user should inherit first from this mixin and then from the intended
+    Django admin options class (e.g. ModelAdmin). Then, in order to activate
+    the select2 widget on specific fields, the user must define a class
+    attribute "select_2_fields" as a dict containing the intended fields
+    names as keys and a dict containing options as values.
+    In the simplest case, the options dict can be empty, because the
+    intended behaviour is automatically inferred from the model field type.
+    However two other functionalities are available:
+    - using the 'widget' key, the user can provide a custom widget,
+    - using the 'widget_kwargs' key, the user can provide the arguments for
+      the widget initialisation. When used alone, this relies on the default
+      widgets automatically chosen according to the field type.
+    """
     def get_formset(self, request, obj=None, **kwargs):
         kwargs['form'] = self.get_form(request, obj)
         return super().get_formset(request, obj, **kwargs)
