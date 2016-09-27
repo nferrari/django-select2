@@ -102,7 +102,6 @@ class Select2AdminMixin(object):
         class CustomFormMetaclass(ModelFormMetaclass):
             def __new__(mcs, name, bases, attrs):
                 for field_name in self.select2_fields:
-                    print('\n\n\n{}'.format(field_name))
                     formfield = get_formfield(field_name)
                     if formfield:
                         attrs[field_name] = formfield
