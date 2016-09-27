@@ -109,7 +109,8 @@ class Select2AdminMixin(object):
                     mcs, name, bases, attrs)
 
         if isinstance(self, admin.ModelAdmin):
-            form_class = super().get_form(request, obj, **kwargs)
+            form_class = super(Select2AdminMixin, self).get_form(
+                request, obj, **kwargs)
         elif isinstance(self, admin.options.InlineModelAdmin):
             form_class = self.form
         else:
@@ -119,6 +120,9 @@ class Select2AdminMixin(object):
             pass
 
         return CustomForm
+
+    class Media:
+        js = ['https://code.jquery.com/jquery-2.2.4.min.js']
 
 
 class Select2AdminInlineMixin(Select2AdminMixin):
@@ -145,4 +149,8 @@ class Select2AdminInlineMixin(Select2AdminMixin):
     """
     def get_formset(self, request, obj=None, **kwargs):
         kwargs['form'] = self.get_form(request, obj)
-        return super().get_formset(request, obj, **kwargs)
+        return super(Select2AdminInlineMixin, self).get_formset(
+            request, obj, **kwargs)
+
+    class Media:
+        js = ['https://code.jquery.com/jquery-2.2.4.min.js']
