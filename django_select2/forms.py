@@ -173,7 +173,9 @@ class Select2TagWidget(Select2TagMixin, Select2Mixin, forms.SelectMultiple):
 
 
 class HeavySelect2Mixin(object):
-    """Mixin that adds select2's AJAX options and registers itself on Django's cache."""
+    """
+    Mixin that adds select2's AJAX options and registers itself on
+    Django's cache."""
 
     def __init__(self, **kwargs):
         """
@@ -187,8 +189,10 @@ class HeavySelect2Mixin(object):
         self.data_view = kwargs.pop('data_view', None)
         self.data_url = kwargs.pop('data_url', None)
         if not (self.data_view or self.data_url):
-            raise ValueError('You must ether specify "data_view" or "data_url".')
-        self.userGetValTextFuncName = kwargs.pop('userGetValTextFuncName', 'null')
+            raise ValueError(
+                'You must ether specify "data_view" or "data_url".')
+        self.userGetValTextFuncName = kwargs.pop(
+            'userGetValTextFuncName', 'null')
         super(HeavySelect2Mixin, self).__init__(**kwargs)
 
     def get_url(self):
@@ -199,7 +203,8 @@ class HeavySelect2Mixin(object):
 
     def build_attrs(self, extra_attrs=None, **kwargs):
         """Set select2's AJAX attributes."""
-        attrs = super(HeavySelect2Mixin, self).build_attrs(extra_attrs=extra_attrs, **kwargs)
+        attrs = super(HeavySelect2Mixin, self).build_attrs(
+            extra_attrs=extra_attrs, **kwargs)
 
         # encrypt instance Id
         self.widget_id = signing.dumps(id(self))
@@ -209,7 +214,6 @@ class HeavySelect2Mixin(object):
         attrs.setdefault('data-ajax--cache', "true")
         attrs.setdefault('data-ajax--type', "GET")
         attrs.setdefault('data-minimum-input-length', 2)
-
         attrs['class'] += ' django-select2-heavy'
         return attrs
 
@@ -235,23 +239,45 @@ class HeavySelect2Mixin(object):
                 'url': self.get_url(),
             })
         except (PicklingError, cPicklingError, AttributeError):
-            msg = "You need to overwrite \"set_to_cache\" or ensure that %s is serialisable."
+            msg = (
+                "You need to overwrite \"set_to_cache\" or ensure that %s "
+                "is serialisable.")
             raise NotImplementedError(msg % self.__class__.__name__)
 
     def render_options(self, *args):
         """Render only selected options."""
         try:
             selected_choices, = args
-        except ValueError:  # Signature contained `choices` prior to Django 1.10
+        except ValueError:
+            # Signature contained `choices` prior to Django 1.10
             choices, selected_choices = args
             choices = chain(self.choices, choices)
         else:
             choices = self.choices
-        output = ['<option></option>' if not self.is_required and not self.allow_multiple_selected else '']
+        # check if all selected_choice are in choices
+        if not isinstance(selected_choices, (list, tuple)):
+            selected_choices = str(selected_choices).split(',')
+        missing_choices = selected_choices[:]
+        for outer_value_0, outer_value_1 in choices:
+            if isinstance(outer_value_1, (list, tuple)):
+                for inner_value_0, inner_value_1 in outer_value_1:
+                    if inner_value_0 in missing_choices:
+                        missing_choices.remove(inner_value_0)
+            else:
+                if outer_value_0 in missing_choices:
+                    missing_choices.remove(inner_value_0)
+        # find a text for missing ones and adds them to choices
+        for value in missing_choices:
+            choices.append((value, ''))
+        output = [
+            '<option></option>' if not self.is_required and
+            not self.allow_multiple_selected else '']
         selected_choices = {force_text(v) for v in selected_choices}
-        choices = {(k, v) for k, v in choices if force_text(k) in selected_choices}
+        choices = {
+            (k, v) for k, v in choices if force_text(k) in selected_choices}
         for option_value, option_label in choices:
-            output.append(self.render_option(selected_choices, option_value, option_label))
+            output.append(self.render_option(
+                selected_choices, option_value, option_label))
         return '\n'.join(output)
 
 

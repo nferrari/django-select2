@@ -97,6 +97,9 @@ class Select2AdminMixin(object):
                     blank_choice=[('', 'None')]
                 )
                 formfield.widget = widget(**widget_kwargs)
+            else:
+                widget = field_options.get('widget', Select2Widget)
+                formfield.widget = widget(**widget_kwargs)
             return formfield
 
         class CustomFormMetaclass(ModelFormMetaclass):

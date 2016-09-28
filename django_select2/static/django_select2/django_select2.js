@@ -24,7 +24,6 @@
                 }
             }
         }, options);
-
         $element.select2(settings);
     };
 
@@ -34,6 +33,18 @@
             var $element = $(element);
             if ($element.hasClass('django-select2-heavy')) {
                 initHeavy($element, settings);
+                $selected_option = $element.find(':selected');
+                if ($selected_option.val() & !$selected_option.text()) {
+                    $.ajax({
+                        type: $element.data('ajax--type'),
+                        url: $element.data('ajax--url') + $selected_option.val(),
+                        dataType: 'json'
+                    }).then(function (data) {
+                        $selected_option.text(data.text);
+                        $selected_option.removeData();
+                        $element.trigger('change');
+                    });
+                }
             } else {
                 init($element, settings);
             }
