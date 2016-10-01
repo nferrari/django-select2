@@ -65,7 +65,7 @@ class Select2AdminMixin(object):
             db_field = self.model._meta.get_field(field_name)
             field_is_m2m = isinstance(db_field, ManyToManyField)
             field_is_fk = isinstance(db_field, ForeignKey)
-            formfield = db_field.formfield(**kwargs)
+            formfield = db_field.formfield()
             if field_is_fk or field_is_m2m:
                 widget_kwargs['model'] = db_field.remote_field.model
                 widget_kwargs['attrs'].setdefault(
