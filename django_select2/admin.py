@@ -119,8 +119,8 @@ class Select2AdminMixin(object):
         else:
             form_class = forms.ModelForm
 
-        class CustomForm(form_class, metaclass=CustomFormMetaclass):
-            pass
+        class CustomForm(form_class):
+            __metaclass__ = CustomFormMetaclass
 
         return CustomForm
 
